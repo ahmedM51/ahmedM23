@@ -3,176 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المواد - منصة الطالب الذكي</title>
+    <title>إدارة المواد الدراسية - منصة الطالب الذكي</title>
+    <meta name="description" content="نظم مواد دراستك ومحاضراتك بطريقة ذكية وفعالة">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         body { 
             font-family: 'Cairo', sans-serif; 
+            direction: rtl;
             background: #f8fafc;
         }
-        .gradient-header { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-        }
-        .card-hover:hover { 
-            transform: translateY(-4px); 
-            transition: all 0.3s ease; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-        .file-upload-area {
-            transition: all 0.3s ease;
-            border: 2px dashed #d1d5db;
+        
+        .subject-card {
+            background: white;
             border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
         }
-        .file-upload-area:hover {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
+        
+        .subject-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
         }
-        .file-upload-area.dragover {
-            border-color: #10b981;
-            background-color: #ecfdf5;
+        
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
         }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
         .modal {
             display: none;
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            align-items: center;
             justify-content: center;
-        }
-        .modal.show {
-            display: flex;
-        }
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 24px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            z-index: 1001;
-            display: none;
-        }
-        .notification.success { background: #10b981; }
-        .notification.error { background: #ef4444; }
-        .notification.info { background: #3b82f6; }
-        .notification.show {
-            display: block;
+            align-items: center;
         }
         
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1002;
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
-        .loading-overlay.show {
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .lecture-item {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
             display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .lecture-completed {
+            background: #c6f6d5;
+            border-color: #68d391;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="text-center">
-            <i class="fas fa-spinner fa-spin text-4xl text-blue-500 mb-4"></i>
-            <p class="text-gray-600">جاري التحميل...</p>
-        </div>
-    </div>
-
-    <!-- Notification Container -->
-    <div id="notificationContainer"></div>
-
     <!-- Header -->
-    <div class="gradient-header text-white p-6 shadow-lg">
-        <div class="container mx-auto">
-            <div class="flex justify-between items-center">
+    <header class="bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-4 space-x-reverse">
-                    <a href="index.html" class="text-white hover:text-gray-200 transition-colors">
-                        <i class="fas fa-arrow-right text-2xl"></i>
-                    </a>
-                    <i class="fas fa-book text-3xl"></i>
-                    <h1 class="text-2xl font-bold">إدارة المواد</h1>
-                </div>
-                <div class="flex items-center space-x-4 space-x-reverse">
-                    <button onclick="showAddSubject()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all">
-                        <i class="fas fa-plus ml-2"></i>إضافة مادة جديدة
-                    </button>
-                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        <i class="fas fa-sign-out-alt ml-1"></i>خروج
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="container mx-auto px-6 py-8">
-        <!-- Statistics Bar -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-book text-blue-500 text-xl"></i>
-                </div>
-                <div class="text-2xl font-bold text-blue-600" id="totalSubjectsCount">0</div>
-                <div class="text-gray-600 text-sm">إجمالي المواد</div>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-graduation-cap text-green-500 text-xl"></i>
-                </div>
-                <div class="text-2xl font-bold text-green-600" id="totalLecturesCount">0</div>
-                <div class="text-gray-600 text-sm">إجمالي المحاضرات</div>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-file-pdf text-purple-500 text-xl"></i>
-                </div>
-                <div class="text-2xl font-bold text-purple-600" id="totalFilesCount">0</div>
-                <div class="text-gray-600 text-sm">الملفات المرفوعة</div>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-chart-line text-orange-500 text-xl"></i>
-                </div>
-                <div class="text-2xl font-bold text-orange-600" id="averageProgress">0%</div>
-                <div class="text-gray-600 text-sm">متوسط التقدم</div>
-            </div>
-        </div>
-
-        <!-- Search and Filter -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
-                    <div class="relative">
-                        <input type="text" id="searchInput" placeholder="البحث في المواد..." 
-                               class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+                        <i class="fas fa-book text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">إدارة المواد الدراسية</h1>
+                        <p class="text-purple-100 text-sm">نظم مواد دراستك بطريقة ذكية</p>
                     </div>
                 </div>
-                <div class="flex space-x-3 space-x-reverse">
-                    <select id="sortBy" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="name">ترتيب حسب الاسم</option>
-                        <option value="date">ترتيب حسب التاريخ</option>
-                        <option value="progress">ترتيب حسب التقدم</option>
-                        <option value="lectures">ترتيب حسب المحاضرات</option>
-                    </select>
-                    <button onclick="refreshSubjects()" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-                        <i class="fas fa-sync-alt"></i>
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <button onclick="openAddSubjectModal()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-plus ml-1"></i>إضافة مادة
                     </button>
+                    <a href="index.html" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-home ml-1"></i>الرئيسية
+                    </a>
                 </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card">
+                <div class="text-3xl font-bold" id="totalSubjects">0</div>
+                <div class="text-sm opacity-90">إجمالي المواد</div>
+            </div>
+            <div class="stats-card">
+                <div class="text-3xl font-bold" id="completedLectures">0</div>
+                <div class="text-sm opacity-90">المحاضرات المنجزة</div>
+            </div>
+            <div class="stats-card">
+                <div class="text-3xl font-bold" id="averageProgress">0%</div>
+                <div class="text-sm opacity-90">متوسط التقدم</div>
+            </div>
+            <div class="stats-card">
+                <div class="text-3xl font-bold" id="studyHours">0</div>
+                <div class="text-sm opacity-90">ساعات الدراسة</div>
             </div>
         </div>
 
@@ -180,785 +188,370 @@
         <div id="subjectsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Subjects will be loaded here -->
         </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <div class="text-6xl text-gray-300 mb-4">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">لا توجد مواد دراسية</h3>
+            <p class="text-gray-500 mb-6">ابدأ بإضافة مادة دراسية جديدة لتنظيم دراستك</p>
+            <button onclick="openAddSubjectModal()" class="btn-primary">
+                <i class="fas fa-plus ml-2"></i>إضافة مادة جديدة
+            </button>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="./js/supabase-config.js"></script>
+    <!-- Add Subject Modal -->
+    <div id="addSubjectModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">إضافة مادة جديدة</h2>
+                <button onclick="closeModal('addSubjectModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="addSubjectForm" onsubmit="addSubject(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">اسم المادة</label>
+                    <input type="text" id="subjectName" class="input-field" placeholder="مثال: الرياضيات" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                    <textarea id="subjectDescription" class="input-field" rows="3" placeholder="وصف مختصر للمادة"></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">اللون</label>
+                    <div class="flex gap-2">
+                        <button type="button" class="w-8 h-8 rounded-full bg-blue-500" onclick="selectColor('#3b82f6')"></button>
+                        <button type="button" class="w-8 h-8 rounded-full bg-green-500" onclick="selectColor('#10b981')"></button>
+                        <button type="button" class="w-8 h-8 rounded-full bg-purple-500" onclick="selectColor('#8b5cf6')"></button>
+                        <button type="button" class="w-8 h-8 rounded-full bg-red-500" onclick="selectColor('#ef4444')"></button>
+                        <button type="button" class="w-8 h-8 rounded-full bg-yellow-500" onclick="selectColor('#f59e0b')"></button>
+                        <button type="button" class="w-8 h-8 rounded-full bg-pink-500" onclick="selectColor('#ec4899')"></button>
+                    </div>
+                    <input type="hidden" id="subjectColor" value="#667eea">
+                </div>
+                
+                <div class="flex gap-3">
+                    <button type="submit" class="btn-primary flex-1">إضافة المادة</button>
+                    <button type="button" onclick="closeModal('addSubjectModal')" class="btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Subject Details Modal -->
+    <div id="subjectDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="subjectDetailsTitle" class="text-xl font-bold"></h2>
+                <button onclick="closeModal('subjectDetailsModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="subjectDetailsContent">
+                <!-- Subject details will be loaded here -->
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Global variables
-        let currentUser = null;
-        
+        let subjects = [];
+        let currentSubjectId = null;
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(async () => {
-                try {
-                    // Load Supabase configuration first
-                    if (!window.supabaseClient) {
-                        await new Promise((resolve) => {
-                            const script = document.createElement('script');
-                            script.src = 'js/supabase-config.js';
-                            script.onload = resolve;
-                            document.head.appendChild(script);
-                        });
-                        
-                        // Wait for initialization
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                    }
-
-                    if (!window.supabaseAuth) {
-                        console.log('❌ No Supabase authentication available');
-                        window.location.href = 'auth.html';
-                        return;
-                    }
-
-                    await checkAuth();
-                    
-                } catch (error) {
-                    console.error('❌ Page initialization error:', error);
-                    window.location.href = 'auth.html';
-                }
-            }, 200);
+            console.log('📚 Subjects page initialized');
+            loadSubjects();
+            updateStats();
         });
 
-        // Check authentication and initialize
-        async function checkAuth() {
+        // Load subjects from localStorage
+        function loadSubjects() {
             try {
-                if (window.supabaseAuth) {
-                    const { data } = await window.supabaseAuth.getSession();
-                    if (data?.session?.user) {
-                        currentUser = data.session.user;
-                        console.log('✅ User authenticated:', currentUser.email);
-                        loadSubjects();
-                    } else {
-                        console.log('❌ No authenticated session found');
-                        window.location.href = 'auth.html';
-                    }
-                } else {
-                    console.error('❌ Supabase authentication not available');
-                    window.location.href = 'auth.html';
+                const saved = localStorage.getItem('subjects');
+                if (saved) {
+                    subjects = JSON.parse(saved);
                 }
-            } catch (error) {
-                console.error('❌ Authentication check failed:', error);
-                window.location.href = 'auth.html';
-            }
-        }
-
-        // Global functions
-        window.showLoading = function() {
-            document.getElementById('loadingOverlay').classList.add('show');
-        };
-
-        window.hideLoading = function() {
-            document.getElementById('loadingOverlay').classList.remove('show');
-        };
-
-        window.showNotification = function(message, type = 'info') {
-            const container = document.getElementById('notificationContainer');
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            
-            container.appendChild(notification);
-            
-            setTimeout(() => notification.classList.add('show'), 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (container.contains(notification)) {
-                        container.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        };
-
-        window.createModal = function(title, content) {
-            const existingModal = document.getElementById('dynamicModal');
-            if (existingModal) {
-                existingModal.remove();
-            }
-            
-            const modal = document.createElement('div');
-            modal.id = 'dynamicModal';
-            modal.className = 'modal show';
-            
-            modal.innerHTML = `
-                <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-800">${title}</h2>
-                            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div>${content}</div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            modal.onclick = function(event) {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            };
-            
-            return modal;
-        };
-
-        window.closeModal = function() {
-            const modal = document.getElementById('dynamicModal');
-            if (modal) {
-                modal.remove();
-            }
-        };
-
-        async function logout() {
-            try {
-                if (window.supabaseAuth) {
-                    await window.supabaseAuth.signOut();
-                }
-                window.location.href = 'auth.html';
-            } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = 'auth.html';
-            }
-        }
-
-        window.refreshSubjects = function() {
-            loadSubjects();
-        };
-
-        // Show Add Subject Modal
-        window.showAddSubject = function() {
-            const content = `
-                <form id="addSubjectForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم المادة</label>
-                            <input type="text" id="subjectName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="مثال: الرياضيات" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">كود المادة</label>
-                            <input type="text" id="subjectCode" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="مثال: MATH101" required>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">وصف المادة</label>
-                        <textarea id="subjectDescription" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="وصف مختصر للمادة..."></textarea>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">لون المادة</label>
-                        <div class="flex space-x-2 space-x-reverse">
-                            <button type="button" onclick="selectColor('blue')" class="w-8 h-8 bg-blue-500 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors" data-color="blue"></button>
-                            <button type="button" onclick="selectColor('green')" class="w-8 h-8 bg-green-500 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors" data-color="green"></button>
-                            <button type="button" onclick="selectColor('red')" class="w-8 h-8 bg-red-500 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors" data-color="red"></button>
-                            <button type="button" onclick="selectColor('yellow')" class="w-8 h-8 bg-yellow-500 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors" data-color="yellow"></button>
-                            <button type="button" onclick="selectColor('purple')" class="w-8 h-8 bg-purple-500 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors" data-color="purple"></button>
-                            <button type="button" onclick="selectColor('pink')" class="w-8 h-8 bg-pink-500 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors" data-color="pink"></button>
-                        </div>
-                        <input type="hidden" id="selectedColor" value="blue">
-                    </div>
-
-                    <!-- File Upload Section -->
-                    <div class="border-t pt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-3">إضافة ملفات للمادة</label>
-                        
-                        <!-- Upload Type Selection -->
-                        <div class="flex space-x-4 space-x-reverse mb-4">
-                            <label class="flex items-center">
-                                <input type="radio" name="uploadType" value="file" class="ml-2" checked onchange="toggleUploadType()">
-                                <span class="text-sm">رفع من الجهاز</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="uploadType" value="url" class="ml-2" onchange="toggleUploadType()">
-                                <span class="text-sm">رابط URL</span>
-                            </label>
-                        </div>
-
-                        <!-- File Upload -->
-                        <div id="fileUploadSection" class="space-y-3">
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                                <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.txt,.ppt,.pptx" class="hidden" onchange="handleFileSelect(event)">
-                                <button type="button" onclick="document.getElementById('fileInput').click()" class="text-blue-600 hover:text-blue-800">
-                                    <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
-                                    <p class="text-sm font-medium">انقر لاختيار الملفات</p>
-                                    <p class="text-xs text-gray-500">PDF, DOC, DOCX, TXT, PPT, PPTX</p>
-                                </button>
-                            </div>
-                            <div id="selectedFiles" class="space-y-2"></div>
-                        </div>
-
-                        <!-- URL Upload -->
-                        <div id="urlUploadSection" class="hidden space-y-3">
-                            <div class="flex space-x-2 space-x-reverse">
-                                <input type="url" id="fileUrl" class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://example.com/file.pdf">
-                                <button type="button" onclick="addUrlFile()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                            <div id="urlFiles" class="space-y-2"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 space-x-reverse pt-4">
-                        <button type="button" onclick="closeModal()" 
-                                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                            إلغاء
-                        </button>
-                        <button type="submit" 
-                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-plus ml-2"></i>إضافة المادة
-                        </button>
-                    </div>
-                </form>
-            `;
-            
-            createModal('إضافة مادة جديدة', content);
-            
-            // Handle form submission
-            document.getElementById('addSubjectForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await addSubject();
-            });
-        };
-
-        // Add Subject function
-        async function addSubject() {
-            const name = document.getElementById('subjectName').value;
-            const code = document.getElementById('subjectCode').value;
-            const description = document.getElementById('subjectDescription').value;
-            const color = document.getElementById('selectedColor').value;
-            
-            if (!name.trim()) {
-                showNotification('يرجى إدخال اسم المادة', 'error');
-                return;
-            }
-            
-            try {
-                showLoading();
-                
-                const subjectData = {
-                    user_id: currentUser.id,
-                    name: name.trim(),
-                    code: code.trim(),
-                    description: description.trim(),
-                    color: color,
-                    progress: 0,
-                    total_lectures: 0,
-                    completed_lectures: 0,
-                    has_files: false,
-                    file_count: 0
-                };
-                
-                const result = await window.supabaseDB.subjects.create(subjectData);
-                if (result.error) throw result.error;
-                
-                showNotification('تم إضافة المادة بنجاح!', 'success');
-                closeModal();
-                loadSubjects();
-                
-            } catch (error) {
-                console.error('Error adding subject:', error);
-                showNotification('خطأ في إضافة المادة', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        async function loadSubjects() {
-            if (!currentUser) return;
-
-            try {
-                if (window.supabaseDB && window.supabaseDB.subjects) {
-                    const { data, error } = await window.supabaseDB.subjects.getAll(currentUser.id);
-                    if (!error && data) {
-                        const subjects = data;
-                        
-                        // Update statistics
-                        updateStatistics(subjects);
-                        
-                        // Render subjects
-                        renderSubjects(subjects);
-                        
-                    } else {
-                        console.warn('⚠️ Could not load subjects from Supabase:', error);
-                    }
-                }
+                renderSubjects();
             } catch (error) {
                 console.error('Error loading subjects:', error);
-                showNotification('خطأ في تحميل المواد', 'error');
+                subjects = [];
             }
         }
 
-        function updateStatistics(subjects) {
-            const totalSubjects = subjects.length;
-            const totalLectures = subjects.reduce((sum, subject) => sum + (subject.total_lectures || 0), 0);
-            const totalFiles = subjects.reduce((sum, subject) => sum + (subject.file_count || 0), 0);
-            const averageProgress = subjects.length > 0 
-                ? Math.round(subjects.reduce((sum, subject) => sum + (subject.progress || 0), 0) / subjects.length)
-                : 0;
-
-            document.getElementById('totalSubjectsCount').textContent = totalSubjects;
-            document.getElementById('totalLecturesCount').textContent = totalLectures;
-            document.getElementById('totalFilesCount').textContent = totalFiles;
-            document.getElementById('averageProgress').textContent = averageProgress + '%';
+        // Save subjects to localStorage
+        function saveSubjects() {
+            try {
+                localStorage.setItem('subjects', JSON.stringify(subjects));
+            } catch (error) {
+                console.error('Error saving subjects:', error);
+            }
         }
 
-        function renderSubjects(subjects) {
+        // Render subjects
+        function renderSubjects() {
             const container = document.getElementById('subjectsContainer');
+            const emptyState = document.getElementById('emptyState');
             
             if (subjects.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-book text-6xl text-gray-300 mb-4"></i>
-                        <h3 class="text-xl font-semibold text-gray-600 mb-2">لا توجد مواد بعد</h3>
-                        <p class="text-gray-500 mb-6">ابدأ بإضافة مادة جديدة لتنظيم دراستك</p>
-                        <button onclick="showAddSubject()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-plus ml-2"></i>إضافة مادة جديدة
-                        </button>
-                    </div>
-                `;
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
                 return;
             }
             
+            emptyState.classList.add('hidden');
+            
             container.innerHTML = subjects.map(subject => `
-                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 card-hover">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-${subject.color}-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-book text-${subject.color}-500 text-xl"></i>
-                            </div>
-                            <div class="flex space-x-2 space-x-reverse">
-                                <button onclick="editSubject('${subject.id}')" class="text-gray-400 hover:text-blue-500 transition-colors">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteSubject('${subject.id}', '${subject.name}')" class="text-gray-400 hover:text-red-500 transition-colors">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
+                <div class="subject-card" style="border-left-color: ${subject.color}">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">${subject.name}</h3>
+                            <p class="text-gray-600 text-sm">${subject.description || 'لا يوجد وصف'}</p>
                         </div>
-                        
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${subject.name}</h3>
-                        <p class="text-gray-600 text-sm mb-4">${subject.description || 'لا يوجد وصف'}</p>
-                        
-                        <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
-                            <span><i class="fas fa-graduation-cap ml-1"></i>${subject.total_lectures || 0} محاضرة</span>
-                            <span><i class="fas fa-file ml-1"></i>${subject.file_count || 0} ملف</span>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-sm text-gray-600">التقدم</span>
-                                <span class="text-sm font-medium text-blue-600">${subject.progress || 0}%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-500 h-2 rounded-full" style="width: ${subject.progress || 0}%"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex space-x-2 space-x-reverse">
-                            <button onclick="viewSubject('${subject.id}')" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                                <i class="fas fa-eye ml-1"></i>عرض
+                        <div class="flex gap-2">
+                            <button onclick="viewSubjectDetails('${subject.id}')" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-eye"></i>
                             </button>
-                            <button onclick="addLecture('${subject.id}')" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
-                                <i class="fas fa-plus ml-1"></i>محاضرة
+                            <button onclick="deleteSubject('${subject.id}')" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>التقدم</span>
+                            <span>${subject.progress || 0}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${subject.progress || 0}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span><i class="fas fa-book-open ml-1"></i>${subject.lectures?.length || 0} محاضرة</span>
+                        <span><i class="fas fa-clock ml-1"></i>${subject.studyHours || 0} ساعة</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Delete Subject
-        window.deleteSubject = async function(subjectId, subjectName) {
-            if (!confirm(`هل أنت متأكد من حذف مادة "${subjectName}"؟\nسيتم حذف جميع المحاضرات والملفات المرتبطة بها.`)) {
-                return;
-            }
+        // Add new subject
+        function addSubject(event) {
+            event.preventDefault();
             
-            try {
-                showLoading();
-                
-                const result = await window.supabaseDB.subjects.delete(subjectId);
-                if (result.error) throw result.error;
-                
-                showNotification('تم حذف المادة بنجاح', 'success');
-                loadSubjects();
-                
-            } catch (error) {
-                console.error('Error deleting subject:', error);
-                showNotification('خطأ في حذف المادة', 'error');
-            } finally {
-                hideLoading();
+            const name = document.getElementById('subjectName').value.trim();
+            const description = document.getElementById('subjectDescription').value.trim();
+            const color = document.getElementById('subjectColor').value;
+            
+            if (!name) return;
+            
+            const newSubject = {
+                id: Date.now().toString(),
+                name,
+                description,
+                color,
+                progress: 0,
+                lectures: [],
+                studyHours: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            subjects.push(newSubject);
+            saveSubjects();
+            renderSubjects();
+            updateStats();
+            closeModal('addSubjectModal');
+            
+            // Reset form
+            document.getElementById('addSubjectForm').reset();
+            document.getElementById('subjectColor').value = '#667eea';
+        }
+
+        // Delete subject
+        function deleteSubject(subjectId) {
+            if (confirm('هل أنت متأكد من حذف هذه المادة؟')) {
+                subjects = subjects.filter(s => s.id !== subjectId);
+                saveSubjects();
+                renderSubjects();
+                updateStats();
             }
-        };
+        }
 
-        // View Subject
-        window.viewSubject = function(subjectId) {
-            showNotification('صفحة تفاصيل المادة قيد التطوير', 'info');
-        };
-
-        // Edit Subject
-        window.editSubject = function(subjectId) {
-            showNotification('ميزة التعديل قيد التطوير', 'info');
-        };
-
-        // Add Lecture
-        window.addLecture = function(subjectId) {
-            const content = `
-                <form id="addLectureForm" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">عنوان المحاضرة</label>
-                        <input type="text" id="lectureTitle" required 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               placeholder="أدخل عنوان المحاضرة">
-                    </div>
+        // View subject details
+        function viewSubjectDetails(subjectId) {
+            const subject = subjects.find(s => s.id === subjectId);
+            if (!subject) return;
+            
+            currentSubjectId = subjectId;
+            document.getElementById('subjectDetailsTitle').textContent = subject.name;
+            
+            const content = document.getElementById('subjectDetailsContent');
+            content.innerHTML = `
+                <div class="mb-6">
+                    <p class="text-gray-600 mb-4">${subject.description || 'لا يوجد وصف'}</p>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">وصف المحاضرة</label>
-                        <textarea id="lectureDescription" rows="3" 
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  placeholder="وصف مختصر للمحاضرة"></textarea>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع المحتوى</label>
-                        <div class="flex space-x-4 space-x-reverse">
-                            <label class="flex items-center">
-                                <input type="radio" name="contentType" value="file" checked class="ml-2">
-                                <span>رفع ملف</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="contentType" value="url" class="ml-2">
-                                <span>رابط خارجي</span>
-                            </label>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="text-center p-4 bg-gray-50 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600">${subject.lectures?.length || 0}</div>
+                            <div class="text-sm text-gray-600">المحاضرات</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-50 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600">${subject.progress || 0}%</div>
+                            <div class="text-sm text-gray-600">التقدم</div>
                         </div>
                     </div>
                     
-                    <div id="fileUploadSection">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">رفع ملف</label>
-                        <div class="file-upload-area border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer" onclick="document.getElementById('fileInput').click()">
-                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                            <p class="text-gray-600">اضغط لاختيار ملف أو اسحب الملف هنا</p>
-                            <p class="text-sm text-gray-500 mt-1">PDF, DOC, DOCX, PPT, PPTX (حد أقصى 50MB)</p>
-                        </div>
-                        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.ppt,.pptx" class="hidden">
-                        <div id="fileInfo" class="mt-2 text-sm text-gray-600"></div>
-                    </div>
-                    
-                    <div id="urlSection" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">الرابط</label>
-                        <input type="url" id="contentUrl" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               placeholder="https://example.com">
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 space-x-reverse pt-4">
-                        <button type="button" onclick="closeModal()" 
-                                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                            إلغاء
-                        </button>
-                        <button type="submit" 
-                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-plus ml-2"></i>إضافة المحاضرة
+                    <div class="mb-4">
+                        <button onclick="addLecture()" class="btn-primary w-full">
+                            <i class="fas fa-plus ml-2"></i>إضافة محاضرة
                         </button>
                     </div>
-                </form>
+                    
+                    <div id="lecturesList">
+                        ${renderLectures(subject.lectures || [])}
+                    </div>
+                </div>
             `;
             
-            createModal('إضافة محاضرة جديدة', content);
-            
-            // Handle content type change
-            document.querySelectorAll('input[name="contentType"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const fileSection = document.getElementById('fileUploadSection');
-                    const urlSection = document.getElementById('urlSection');
-                    
-                    if (this.value === 'file') {
-                        fileSection.classList.remove('hidden');
-                        urlSection.classList.add('hidden');
-                    } else {
-                        fileSection.classList.add('hidden');
-                        urlSection.classList.remove('hidden');
-                    }
-                });
-            });
-            
-            // Handle file selection
-            document.getElementById('fileInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                const fileInfo = document.getElementById('fileInfo');
-                
-                if (file) {
-                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-                    fileInfo.innerHTML = `
-                        <i class="fas fa-file ml-1"></i>
-                        <span class="font-medium">${file.name}</span>
-                        <span class="text-gray-500">(${fileSize} MB)</span>
-                    `;
-                }
-            });
-            
-            // Handle form submission
-            document.getElementById('addLectureForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await addLectureToSubject(subjectId);
-            });
-        };
+            openModal('subjectDetailsModal');
+        }
 
-        async function addLectureToSubject(subjectId) {
-            const title = document.getElementById('lectureTitle').value;
-            const description = document.getElementById('lectureDescription').value;
-            const contentType = document.querySelector('input[name="contentType"]:checked').value;
-            
-            if (!title.trim()) {
-                showNotification('يرجى إدخال عنوان المحاضرة', 'error');
-                return;
+        // Render lectures
+        function renderLectures(lectures) {
+            if (lectures.length === 0) {
+                return '<p class="text-gray-500 text-center py-4">لا توجد محاضرات</p>';
             }
             
-            try {
-                showLoading();
-                
-                const lectureData = {
-                    subject_id: subjectId,
-                    title: title.trim(),
-                    description: description.trim(),
-                    content_type: contentType,
-                    completed: false,
-                    created_at: new Date().toISOString()
-                };
-                
-                if (contentType === 'file') {
-                    const fileInput = document.getElementById('fileInput');
-                    if (fileInput.files[0]) {
-                        lectureData.file_name = fileInput.files[0].name;
-                        lectureData.file_size = fileInput.files[0].size;
-                        // In a real implementation, you would upload the file here
-                    }
-                } else {
-                    const url = document.getElementById('contentUrl').value;
-                    if (url) {
-                        lectureData.content_url = url;
-                    }
-                }
-                
-                const result = await window.supabaseDB.lectures.create(lectureData);
-                if (result.error) throw result.error;
-                
-                showNotification('تم إضافة المحاضرة بنجاح!', 'success');
-                closeModal();
-                loadSubjects(); // Refresh to update lecture counts
-                
-            } catch (error) {
-                console.error('Error adding lecture:', error);
-                showNotification('خطأ في إضافة المحاضرة', 'error');
-            } finally {
-                hideLoading();
+            return lectures.map((lecture, index) => `
+                <div class="lecture-item ${lecture.completed ? 'lecture-completed' : ''}">
+                    <div class="flex-1">
+                        <div class="font-medium">${lecture.title}</div>
+                        <div class="text-sm text-gray-600">${lecture.description || ''}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="toggleLecture(${index})" class="text-sm ${lecture.completed ? 'text-green-600' : 'text-gray-600'}">
+                            <i class="fas fa-${lecture.completed ? 'check-circle' : 'circle'}"></i>
+                        </button>
+                        <button onclick="deleteLecture(${index})" class="text-sm text-red-600">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add lecture
+        function addLecture() {
+            const title = prompt('عنوان المحاضرة:');
+            if (!title) return;
+            
+            const description = prompt('وصف المحاضرة (اختياري):');
+            
+            const subject = subjects.find(s => s.id === currentSubjectId);
+            if (!subject.lectures) subject.lectures = [];
+            
+            subject.lectures.push({
+                title,
+                description,
+                completed: false,
+                createdAt: new Date().toISOString()
+            });
+            
+            updateSubjectProgress(subject);
+            saveSubjects();
+            viewSubjectDetails(currentSubjectId);
+            updateStats();
+        }
+
+        // Toggle lecture completion
+        function toggleLecture(lectureIndex) {
+            const subject = subjects.find(s => s.id === currentSubjectId);
+            if (subject.lectures[lectureIndex]) {
+                subject.lectures[lectureIndex].completed = !subject.lectures[lectureIndex].completed;
+                updateSubjectProgress(subject);
+                saveSubjects();
+                viewSubjectDetails(currentSubjectId);
+                updateStats();
             }
         }
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const subjectCards = document.querySelectorAll('#subjectsContainer > div');
+        // Delete lecture
+        function deleteLecture(lectureIndex) {
+            if (confirm('هل أنت متأكد من حذف هذه المحاضرة؟')) {
+                const subject = subjects.find(s => s.id === currentSubjectId);
+                subject.lectures.splice(lectureIndex, 1);
+                updateSubjectProgress(subject);
+                saveSubjects();
+                viewSubjectDetails(currentSubjectId);
+                updateStats();
+            }
+        }
+
+        // Update subject progress
+        function updateSubjectProgress(subject) {
+            if (!subject.lectures || subject.lectures.length === 0) {
+                subject.progress = 0;
+                return;
+            }
             
-            subjectCards.forEach(card => {
-                const subjectName = card.querySelector('h3').textContent.toLowerCase();
-                const subjectDesc = card.querySelector('p').textContent.toLowerCase();
-                
-                if (subjectName.includes(searchTerm) || subjectDesc.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
+            const completed = subject.lectures.filter(l => l.completed).length;
+            subject.progress = Math.round((completed / subject.lectures.length) * 100);
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalSubjects = subjects.length;
+            const totalLectures = subjects.reduce((sum, s) => sum + (s.lectures?.length || 0), 0);
+            const completedLectures = subjects.reduce((sum, s) => sum + (s.lectures?.filter(l => l.completed).length || 0), 0);
+            const averageProgress = totalSubjects > 0 ? Math.round(subjects.reduce((sum, s) => sum + (s.progress || 0), 0) / totalSubjects) : 0;
+            const studyHours = subjects.reduce((sum, s) => sum + (s.studyHours || 0), 0);
+            
+            document.getElementById('totalSubjects').textContent = totalSubjects;
+            document.getElementById('completedLectures').textContent = completedLectures;
+            document.getElementById('averageProgress').textContent = averageProgress + '%';
+            document.getElementById('studyHours').textContent = studyHours;
+        }
+
+        // Modal functions
+        function openAddSubjectModal() {
+            openModal('addSubjectModal');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
 
         // Color selection
-        let selectedFiles = [];
-        let urlFiles = [];
-
         function selectColor(color) {
-            // Remove previous selection
-            document.querySelectorAll('[data-color]').forEach(btn => {
-                btn.classList.remove('border-gray-800');
-                btn.classList.add('border-transparent');
+            document.getElementById('subjectColor').value = color;
+            
+            // Update visual feedback
+            document.querySelectorAll('.w-8.h-8.rounded-full').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-offset-2', 'ring-gray-400');
             });
             
-            // Add selection to clicked color
-            document.querySelector(`[data-color="${color}"]`).classList.remove('border-transparent');
-            document.querySelector(`[data-color="${color}"]`).classList.add('border-gray-800');
-            
-            document.getElementById('selectedColor').value = color;
+            event.target.classList.add('ring-2', 'ring-offset-2', 'ring-gray-400');
         }
 
-        // Toggle upload type
-        function toggleUploadType() {
-            const uploadType = document.querySelector('input[name="uploadType"]:checked').value;
-            const fileSection = document.getElementById('fileUploadSection');
-            const urlSection = document.getElementById('urlUploadSection');
-            
-            if (uploadType === 'file') {
-                fileSection.classList.remove('hidden');
-                urlSection.classList.add('hidden');
-            } else {
-                fileSection.classList.add('hidden');
-                urlSection.classList.remove('hidden');
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
-        }
+        });
 
-        // Handle file selection
-        function handleFileSelect(event) {
-            const files = Array.from(event.target.files);
-            selectedFiles = [...selectedFiles, ...files];
-            displaySelectedFiles();
-        }
-
-        // Display selected files
-        function displaySelectedFiles() {
-            const container = document.getElementById('selectedFiles');
-            container.innerHTML = '';
-            
-            selectedFiles.forEach((file, index) => {
-                const fileDiv = document.createElement('div');
-                fileDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg';
-                fileDiv.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-file-alt text-blue-500 ml-3"></i>
-                        <div>
-                            <p class="text-sm font-medium">${file.name}</p>
-                            <p class="text-xs text-gray-500">${formatFileSize(file.size)}</p>
-                        </div>
-                    </div>
-                    <button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                container.appendChild(fileDiv);
-            });
-        }
-
-        // Add URL file
-        function addUrlFile() {
-            const urlInput = document.getElementById('fileUrl');
-            const url = urlInput.value.trim();
-            
-            if (!url) {
-                showNotification('يرجى إدخال رابط صحيح', 'error');
-                return;
-            }
-            
-            if (!isValidUrl(url)) {
-                showNotification('الرابط غير صحيح', 'error');
-                return;
-            }
-            
-            const fileName = url.split('/').pop() || 'ملف من الرابط';
-            urlFiles.push({ url, name: fileName });
-            urlInput.value = '';
-            displayUrlFiles();
-        }
-
-        // Display URL files
-        function displayUrlFiles() {
-            const container = document.getElementById('urlFiles');
-            container.innerHTML = '';
-            
-            urlFiles.forEach((file, index) => {
-                const fileDiv = document.createElement('div');
-                fileDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg';
-                fileDiv.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-link text-green-500 ml-3"></i>
-                        <div>
-                            <p class="text-sm font-medium">${file.name}</p>
-                            <p class="text-xs text-gray-500">${file.url}</p>
-                        </div>
-                    </div>
-                    <button type="button" onclick="removeUrlFile(${index})" class="text-red-500 hover:text-red-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                container.appendChild(fileDiv);
-            });
-        }
-
-        // Remove file
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            displaySelectedFiles();
-        }
-
-        // Remove URL file
-        function removeUrlFile(index) {
-            urlFiles.splice(index, 1);
-            displayUrlFiles();
-        }
-
-        // Format file size
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Validate URL
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-
-        // Upload files to server
-        async function uploadFiles(subjectId) {
-            const uploadPromises = [];
-            
-            // Upload local files
-            for (const file of selectedFiles) {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('subject_id', subjectId);
-                formData.append('user_id', currentUser.id);
-                
-                uploadPromises.push(
-                    fetch('/api/upload', {
-                        method: 'POST',
-                        body: formData
-                    })
-                );
-            }
-            
-            // Save URL files to database
-            for (const urlFile of urlFiles) {
-                uploadPromises.push(
-                    window.supabaseDB.uploaded_files.create({
-                        user_id: currentUser.id,
-                        subject_id: subjectId,
-                        file_name: urlFile.name,
-                        file_url: urlFile.url,
-                        file_type: 'url',
-                        file_size: 0
-                    })
-                );
-            }
-            
-            try {
-                await Promise.all(uploadPromises);
-                console.log('✅ Files uploaded successfully');
-            } catch (error) {
-                console.error('❌ Error uploading files:', error);
-                showNotification('حدث خطأ في رفع بعض الملفات', 'error');
-            }
-        }
+        console.log('✅ Subjects page loaded successfully');
     </script>
 </body>
 </html>
