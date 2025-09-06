@@ -1028,3 +1028,152 @@ ${lecture.description ? `الوصف: ${lecture.description}` : ''}
 
     console.log('✅ Supabase configuration loaded - Real database mode only');
 }
+
+// تكوين Supabase للعمل مع Vercel
+let supabaseClient = null;
+let supabaseAuth = null;
+let supabaseDB = null;
+
+// تهيئة Supabase
+async function initializeSupabase() {
+    try {
+        console.log('🔧 Initializing Supabase for Vercel...');
+        
+        // استخدام Supabase مباشرة من CDN
+        const { createClient } = supabase;
+        
+        // إعدادات Supabase (يجب تحديثها في Vercel Environment Variables)
+        const SUPABASE_URL = 'https://pxmhwwovxrnefiryywva.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4bWh3d292eHJuZWZpcnl5d3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0MzgzNjQsImV4cCI6MjA3MjAxNDM2NH0.FqzkWel93icaJ781ZCPhvzfVJu4iwqCa3hxV3AKuRlA';
+        
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseAuth = supabaseClient.auth;
+        
+        // إعداد وظائف قاعدة البيانات للعمل مع Vercel API
+        supabaseDB = {
+            // إنشاء سجل جديد
+            async create(table, data, userId) {
+                const response = await fetch('/api/supabase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'create',
+                        table: table,
+                        data: data,
+                        userId: userId
+                    })
+                });
+                return await response.json();
+            },
+            
+            // قراءة السجلات
+            async read(table, userId) {
+                const response = await fetch('/api/supabase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'read',
+                        table: table,
+                        userId: userId
+                    })
+                });
+                return await response.json();
+            },
+            
+            // تحديث سجل
+            async update(table, id, data, userId) {
+                const response = await fetch('/api/supabase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'update',
+                        table: table,
+                        id: id,
+                        data: data,
+                        userId: userId
+                    })
+                });
+                return await response.json();
+            },
+            
+            // حذف سجل
+            async delete(table, id, userId) {
+                const response = await fetch('/api/supabase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'delete',
+                        table: table,
+                        id: id,
+                        userId: userId
+                    })
+                });
+                return await response.json();
+            }
+        };
+        
+        // جعل المتغيرات متاحة عالمياً
+        window.supabaseClient = supabaseClient;
+        window.supabaseAuth = supabaseAuth;
+        window.supabaseDB = supabaseDB;
+        
+        console.log('✅ Supabase initialized successfully for Vercel');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize Supabase:', error);
+        return false;
+    }
+}
+
+// تهيئة المساعد الذكي للعمل مع Vercel
+window.sendMessageToAI = async function(message, userId) {
+    try {
+        const response = await fetch('/api/ai-chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                userId: userId
+            })
+        });
+        
+        const result = await response.json();
+        return result;
+        
+    } catch (error) {
+        console.error('AI Chat Error:', error);
+        return {
+            success: false,
+            error: 'حدث خطأ في الاتصال بالمساعد الذكي'
+        };
+    }
+};
+
+// فحص صحة الاتصال
+window.checkHealth = async function() {
+    try {
+        const response = await fetch('/api/health');
+        const result = await response.json();
+        console.log('Health Check:', result);
+        return result;
+    } catch (error) {
+        console.error('Health Check Error:', error);
+        return { status: 'error', error: error.message };
+    }
+};
+
+// تهيئة تلقائية عند تحميل الصفحة
+if (typeof window !== 'undefined') {
+    window.initializeSupabase = initializeSupabase;
+}

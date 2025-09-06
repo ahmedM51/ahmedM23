@@ -1,34 +1,35 @@
 User-agent: *
 Allow: /
+Allow: /index.html
+Allow: /ai-assistant.html
+Allow: /subjects.html
+Allow: /planner.html
+Allow: /study-timer.html
+Allow: /js/
+Allow: /css/
+Allow: /images/
 
-# Disallow sensitive directories
-Disallow: /api/
-Disallow: /logs/
-Disallow: /node_modules/
-Disallow: /uploads/
-Disallow: /.env
-Disallow: /server.js
-Disallow: /package.json
-Disallow: /package-lock.json
-
-# Disallow authentication pages from indexing
+# منع فهرسة صفحات المصادقة والملفات الحساسة
 Disallow: /auth.html
-Disallow: /auth
+Disallow: /uploads/
+Disallow: /logs/
+Disallow: /.env
+Disallow: /node_modules/
+Disallow: /server.js
+Disallow: /supabaseApi.js
 
-# Allow important files
-Allow: /sitemap.xml
-Allow: /robots.txt
-Allow: /google*.html
-
-# Crawl delay (optional)
-Crawl-delay: 1
-
-# Sitemap location
-Sitemap: https://student-platform-eta.vercel.app/sitemap.xml
-
-# Additional instructions for specific bots
+# السماح لمحركات البحث الرئيسية
 User-agent: Googlebot
 Allow: /
 
 User-agent: Bingbot
 Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# موقع خريطة الموقع
+Sitemap: https://student-platform-eta.vercel.app/sitemap.xml
+
+# معدل الزحف (اختياري)
+Crawl-delay: 1
